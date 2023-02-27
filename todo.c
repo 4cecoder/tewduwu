@@ -16,29 +16,10 @@ int num_items = 0;
 
 void add_item(char* text, int level) {
     if (num_items < MAX_ITEMS) {
-        if (level == 0) {
-// Top-level item
-            strcpy(items[num_items].text, text);
-            items[num_items].done = 0;
-            items[num_items].nested_level = 0;
-            num_items++;
-        } else {
-// Subtask
-            int i;
-            for (i = num_items - 1; i >= 0; i--) {
-                if (items[i].nested_level == level - 1) {
-                    break;
-                }
-            }
-            if (i >= 0) {
-// Found parent task, insert after it
-                memmove(&items[i+2], &items[i+1], (num_items - i - 1) * sizeof(todo_item));
-                strcpy(items[i+1].text, text);
-                items[i+1].done = 0;
-                items[i+1].nested_level = level;
-                num_items++;
-            }
-        }
+        strcpy(items[num_items].text, text);
+        items[num_items].done = 0;
+        items[num_items].nested_level = level;
+        num_items++;
     }
 }
 
@@ -63,6 +44,9 @@ void draw_list(int selected_index) {
         if (i == selected_index) {
             attron(A_REVERSE);
         }
+        for (int j = 0; j < items[i].nested_level; j++) {
+            mvprintw(i, j * 2, "  ");
+        }
         mvprintw(i, items[i].nested_level * 2, "[%c] %s",
                  items[i].done ? 'x' : ' ',
                  items[i].text);
@@ -83,12 +67,46 @@ int get_max_nested_level() {
     return max_level;
 }
 
+void save_items(char* filename) {
+    FILE* fp = fopen(filename, "w");
+    if (fp) {
+        for (int i = 0; i < num_items; i++) {
+            fprintf(fp, "%d,%d,%s\n", items[i].done, items[i].nested_level, items[i].text);
+        }
+        fclose(fp);
+    }
+}
+
+void load_items(char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file != NULL) {
+        char line[MAX_ITEM_LEN + 2];
+        while (fgets(line, sizeof(line), file) != NULL) {
+            int len = strlen(line);
+            if (len > 0 && line[len - 1] == '\n') {
+                line[len - 1] = '\0';
+            }
+            int done, level;
+            char text[MAX_ITEM_LEN + 1];
+            if (sscanf(line, "%d,%d,%s", &done, &level, text) == 3) {
+                add_item(text, level);
+            } else if (sscanf(line, "%d,%s", &done, text) == 2) {
+                add_item(text, 0);
+            }
+        }
+        fclose(file);
+    }
+}
+
 int main() {
     // Initialize ncurses
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+
+    // Load the todos from a file
+    load_items("todos.txt");
 
     int selected_index = 0;
     draw_list(selected_index);
@@ -113,8 +131,7 @@ int main() {
             case ' ':
                 toggle_item(selected_index);
                 break;
-            case 'a':
-            {
+            case 'a': {
                 char buf[MAX_ITEM_LEN + 1];
                 echo();
                 move(num_items, 0);
@@ -122,16 +139,19 @@ int main() {
                 noecho();
                 add_item(buf, 0);
                 selected_index = num_items - 1;
-            }
+                save_items("todos.txt");
                 break;
+            }
             case 'd':
                 remove_item(selected_index);
                 if (selected_index >= num_items) {
                     selected_index--;
                 }
+                save_items("todos.txt");
                 break;
             case 'q':
                 endwin();
+                save_items("todos.txt");
                 return 0;
             case 'l':
                 if (items[selected_index].nested_level < get_max_nested_level()) {
@@ -160,21 +180,21 @@ int main() {
                     }
                 }
                 break;
-            case 'r':
-            {
+            case 'r': {
                 echo();
                 move(selected_index, items[selected_index].nested_level * 2 + 4);
                 clrtoeol();
-                mvprintw(selected_index, items[selected_index].nested_level * 2, "[%c]", items[selected_index].done ? 'x' : ' ');
+                mvprintw(selected_index, items[selected_index].nested_level * 2, "[%c]",
+                         items[selected_index].done ? 'x' : ' ');
                 move(selected_index, items[selected_index].nested_level * 2 + 4);
                 char buf[MAX_ITEM_LEN + 1];
                 getstr(buf);
                 strcpy(items[selected_index].text, buf);
                 noecho();
-            }
+                save_items("todos.txt");
                 break;
-            case 'i':
-            {
+            }
+            case 'i': {
                 char buf[MAX_ITEM_LEN + 1];
                 echo();
                 move(num_items, 0);
@@ -182,9 +202,15 @@ int main() {
                 noecho();
                 add_item(buf, items[selected_index].nested_level + 1);
                 selected_index = num_items - 1;
-            }
+                save_items("todos.txt");
                 break;
+            }
         }
         draw_list(selected_index);
     }
+
+    // Clean up ncurses
+    endwin();
+
+    return 0;
 }
