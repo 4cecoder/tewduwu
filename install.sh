@@ -2,9 +2,10 @@
 
 # Check if tewduwu binary exists
 if [ -x "$(command -v ./tewduwu)" ]; then
-  echo "tewduwu binary found, installing to /usr/local/bin..."
+  echo "tewduwu binaiwee found, instawwing to /usr/local/bin..."
   cp ./tewduwu /usr/local/bin/
-  echo "tewduwu installed successfully."
+  echo "tewduwu installed successfuwwy."
 else
-  echo "tewduwu binary not found. Please build it using build.sh before running this script."
+  echo "tewduwu binary not found."
+  echo "Please buiwd it using one of the build.sh scripts before running this install scwipt."
 fi
