@@ -1,6 +1,10 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
 
 #define MAX_ITEMS 100
 #define MAX_ITEM_LEN 80
@@ -13,6 +17,17 @@ typedef struct {
 
 todo_item items[MAX_ITEMS] = {0};
 int num_items = 0;
+
+char* get_config_dir() {
+    char* home_dir = getenv("HOME");
+    if (home_dir == NULL) {
+        return NULL;
+    }
+
+    static char config_dir[PATH_MAX];
+    snprintf(config_dir, sizeof(config_dir), "%s/.config/tewduwu", home_dir);
+    return config_dir;
+}
 
 void add_item(char* text, int level) {
     if (num_items < MAX_ITEMS) {
@@ -67,7 +82,20 @@ int get_max_nested_level() {
     return max_level;
 }
 
-void save_items(char* filename) {
+void save_items() {
+    char* config_dir = get_config_dir();
+    if (config_dir == NULL) {
+        return;
+    }
+
+    struct stat st = {0};
+    if (stat(config_dir, &st) == -1) {
+        mkdir(config_dir, 0700);
+    }
+
+    char filename[PATH_MAX];
+    snprintf(filename, sizeof(filename), "%s/todo.txt", config_dir);
+
     FILE* fp = fopen(filename, "w");
     if (fp) {
         for (int i = 0; i < num_items; i++) {
@@ -77,24 +105,39 @@ void save_items(char* filename) {
     }
 }
 
-void load_items(char* filename) {
-    FILE* file = fopen(filename, "r");
-    if (file != NULL) {
-        char line[MAX_ITEM_LEN + 2];
-        while (fgets(line, sizeof(line), file) != NULL) {
+void load_items() {
+    char* config_dir = get_config_dir();
+    if (config_dir == NULL) {
+        return;
+    }
+
+    struct stat st = {0};
+    if (stat(config_dir, &st) == -1) {
+        mkdir(config_dir, 0700);
+    }
+
+    char filename[PATH_MAX];
+    snprintf(filename, sizeof(filename), "%s/todo.txt", config_dir);
+
+    FILE* fp = fopen(filename, "r");
+    if (fp) {
+        char line[MAX_ITEM_LEN + 20];
+        while (fgets(line, sizeof(line), fp) != NULL) {
             int len = strlen(line);
             if (len > 0 && line[len - 1] == '\n') {
                 line[len - 1] = '\0';
             }
             int done, level;
             char text[MAX_ITEM_LEN + 1];
-            if (sscanf(line, "%d,%d,%s", &done, &level, text) == 3) {
+            if (sscanf(line, "%d,%d,%80[^\n]", &done, &level, text) == 3) {
                 add_item(text, level);
-            } else if (sscanf(line, "%d,%s", &done, text) == 2) {
+                items[num_items-1].done = done;
+            } else if (sscanf(line, "%d,%80[^\n]", &done, text) == 2) {
                 add_item(text, 0);
+                items[num_items-1].done = done;
             }
         }
-        fclose(file);
+        fclose(fp);
     }
 }
 
@@ -106,7 +149,7 @@ int main() {
     keypad(stdscr, TRUE);
 
     // Load the todos from a file
-    load_items("todos.txt");
+    load_items();
 
     int selected_index = 0;
     draw_list(selected_index);
@@ -139,7 +182,7 @@ int main() {
                 noecho();
                 add_item(buf, 0);
                 selected_index = num_items - 1;
-                save_items("todos.txt");
+                save_items();
                 break;
             }
             case 'd':
@@ -147,11 +190,11 @@ int main() {
                 if (selected_index >= num_items) {
                     selected_index--;
                 }
-                save_items("todos.txt");
+                save_items();
                 break;
             case 'q':
                 endwin();
-                save_items("todos.txt");
+                save_items();
                 return 0;
             case 'l':
                 if (items[selected_index].nested_level < get_max_nested_level()) {
@@ -191,7 +234,7 @@ int main() {
                 getstr(buf);
                 strcpy(items[selected_index].text, buf);
                 noecho();
-                save_items("todos.txt");
+                save_items();
                 break;
             }
             case 'i': {
@@ -202,7 +245,7 @@ int main() {
                 noecho();
                 add_item(buf, items[selected_index].nested_level + 1);
                 selected_index = num_items - 1;
-                save_items("todos.txt");
+                save_items();
                 break;
             }
         }
