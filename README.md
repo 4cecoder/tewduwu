@@ -4,7 +4,8 @@ Ohaiii! UwU nuzzles Are you weady to be pwoductive today? Let's manage our tasks
 
 
 
-https://user-images.githubusercontent.com/88108711/221503682-e974cdcf-c58c-43fe-a2f9-e02a416a55e3.mp4
+https://user-images.githubusercontent.com/88108711/221505227-a4402539-a2f9-4ac4-b091-3f5e4a6c34c4.mp4
+
 
 
 
