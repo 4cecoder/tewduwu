@@ -18,7 +18,7 @@ Press the `"q"` key to quit the application.
 
 Nyaa~ Don't forget to hit the `Enter` key after typing your description to add item to the todo list!
 
-Audio Directions:
+### If TLDR:
 
 
 https://user-images.githubusercontent.com/88108711/221494129-469ec295-57f4-4ca7-aae1-f4919eb3221a.mp4
