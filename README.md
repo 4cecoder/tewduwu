@@ -3,7 +3,9 @@
 # Contwols:
 
 Use the `up` and `down` arrow keys to move the cursor between tasks in the task list.
-    
+
+Alternatively use the `k` key for up and the `j` key for down. 
+
 Press the `space bar` to mark or unmark the currently selected task as complete.
     
 Press the `"a"` key to add a new task. You will be prompted to enter a description for the new task.
