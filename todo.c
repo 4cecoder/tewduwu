@@ -72,12 +72,14 @@ int main() {
         int ch = getch();
         switch (ch) {
             case KEY_UP:
+            case 'k':
                 selected_index--;
                 if (selected_index < 0) {
                     selected_index = num_items - 1;
                 }
                 break;
             case KEY_DOWN:
+            case 'j':
                 selected_index++;
                 if (selected_index >= num_items) {
                     selected_index = 0;
