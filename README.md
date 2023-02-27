@@ -1,6 +1,6 @@
 # tewduwu
 
-# Controls:
+# Contwols:
 
 Use the `up` and `down` arrow keys to move the cursor between tasks in the task list.
     
