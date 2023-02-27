@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_ITEMS 100
 #define MAX_ITEM_LEN 80
@@ -9,6 +10,7 @@
 typedef struct {
     char text[MAX_ITEM_LEN + 1];
     int done;
+    short *colors;
 } todo_item;
 
 // Initialize todo items array
@@ -20,6 +22,15 @@ void add_item(char* text) {
     if (num_items < MAX_ITEMS) {
         strcpy(items[num_items].text, text);
         items[num_items].done = 0;
+        items[num_items].colors = calloc((MAX_ITEM_LEN + 1), sizeof(short));
+        srand(time(NULL));
+        for (int i = 0; i <= MAX_ITEM_LEN; i++) {
+            short color;
+            do {
+                color = (rand() % (COLORS - 1)) + 1;
+            } while (color == COLOR_BLACK);
+            items[num_items].colors[i] = color;
+        }
         num_items++;
     }
 }
@@ -27,6 +38,7 @@ void add_item(char* text) {
 // Function to remove an item
 void remove_item(int index) {
     if (index >= 0 && index < num_items) {
+        free(items[index].colors);
         for (int i = index; i < num_items - 1; i++) {
             items[i] = items[i+1];
         }
@@ -48,9 +60,11 @@ void draw_list(int selected_index) {
         if (i == selected_index) {
             attron(A_REVERSE);
         }
-        mvprintw(i, 0, "[%c] %s",
-            items[i].done ? 'x' : ' ',
-            items[i].text);
+        for (int j = 0; j < strlen(items[i].text); j++) {
+            attron(COLOR_PAIR(items[i].colors[j]));
+            mvprintw(i, j, "%c", items[i].text[j]);
+            attroff(COLOR_PAIR(items[i].colors[j]));
+        }
         if (i == selected_index) {
             attroff(A_REVERSE);
         }
@@ -58,12 +72,20 @@ void draw_list(int selected_index) {
     refresh();
 }
 
-int main() {
+// Function to run the todo app
+void run_todo_app() {
     // Initialize ncurses
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);
+    init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(6, COLOR_CYAN, COLOR_BLACK);
 
     // Main loop
     int selected_index = 0;
@@ -107,9 +129,8 @@ int main() {
                 break;
             case 'q':
                 endwin();
-                return 0;
+                return;
         }
         draw_list(selected_index);
     }
 }
-
