@@ -2,6 +2,12 @@
 
 Ohaiii! UwU nuzzles Are you weady to be pwoductive today? Let's manage our tasks togethewr with tewduwu!
 
+
+
+https://user-images.githubusercontent.com/88108711/221503682-e974cdcf-c58c-43fe-a2f9-e02a416a55e3.mp4
+
+
+
 # Contwows:
 
 Use the `up` and `down` arrow keys to move the cuwrsow between tasks in the task list.
