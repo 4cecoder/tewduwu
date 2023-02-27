@@ -1,2 +1,2 @@
-gcc todo.c -o todo -lncurses
+gcc todo.c -o tewdew -lncurses
 
