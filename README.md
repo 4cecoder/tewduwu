@@ -1,30 +1,60 @@
-# tewduwu
+# tewduwu - Terminal TODO Manager
 
-Ohaiii! UwU nuzzles Are you weady to be pwoductive today? Let's manage our tasks togethewr with tewduwu!
+A terminal-based hierarchical TODO list manager with rich features.
 
+## Features
 
+- Hierarchical task organization (with nested tasks)
+- Priority levels (High, Medium, Low)
+- Color-coded interface
+- Vim-inspired keybindings
+- Task reordering
+- Automatic saving
 
-https://user-images.githubusercontent.com/88108711/221506625-3c68cf84-b84e-4d29-adc8-3ac1536d85d9.mp4
+## Getting Started
 
+### Prerequisites
 
-# Contwows:
+- C compiler (gcc, clang, etc.)
+- ncurses library
 
-Use the `up` and `down` arrow keys or `k` and `j` keys to move the cuwrsow between tasks in the task list.
+### Building
 
-Press the 🪐🍻`space bar` to ✅ mark or unmark the currently selected task as complete.
+```bash
+gcc -o tewduwu todo.c -lncurses
+```
 
-Press the `"a"` key to ➕ add a new top level task. Time to entewr a description for the new task. Don't fowget to use youw UwU language!
+### Running
 
-Press the `"i"` key to 🆕➕ add a new subtask to the currently selected task. Entewr a description for the new subtask.
+```bash
+./tewduwu
+```
 
-Press the `"d"` key to ➖ delete the currently selected task. The task is deleted!
+## Usage
 
-Press the `"h"` key to ⬅️ move the selected task to its parent task.
+### Basic Controls
 
-Press the `"l"` key to ➡️ move the selected task to its first child task.
+- `j` or `Down Arrow`: Move cursor down
+- `k` or `Up Arrow`: Move cursor up
+- `Space`: Toggle task completion
+- `a`: Add a new task
+- `i`: Insert a subtask under the current task
+- `d`: Delete task and all subtasks
+- `r`: Rename/edit the current task
+- `q`: Quit application
+- `?`: Show help screen
 
-Press the `"r"` key to ✍️ weename the currently selected task. Time to entewr a new name. Don't fowget to use youw UwU language!
+### Advanced Controls
 
-Aww, weaving so soon? 🥺 Press the `"q"` key to 🚪 quit the application.
+- `h`: Go to parent item
+- `l`: Go to first child item
+- `1`: Set Low priority
+- `2`: Set Medium priority
+- `3`: Set High priority
+- `0`: Clear priority
+- `J`: Move task down
+- `K`: Move task up
 
-Nyaa~ 🐈 Don't forget to hit the `Enter` 🔑 key after typing your description to 🔒 lock the item into the todo list!
+## Configuration
+
+Tasks are saved to `~/.config/tewduwu/todo.txt`.
